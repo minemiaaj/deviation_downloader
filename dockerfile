@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-# Install Chrome dan dependensi
+# Install dependensi Chrome
 RUN apt-get update && apt-get install -y \
     wget gnupg2 ca-certificates \
     fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
@@ -13,18 +13,13 @@ RUN wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-
     && apt-get update && apt-get install -y /tmp/chrome.deb \
     && rm /tmp/chrome.deb
 
-# Set working directory
 WORKDIR /app
 
-# Copy dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy aplikasi
 COPY . .
 
-# Expose port
 EXPOSE 5000
 
-# Jalankan Flask
 CMD ["python", "app.py"]
