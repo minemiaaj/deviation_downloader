@@ -11,7 +11,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 from openpyxl.utils import get_column_letter
@@ -33,15 +32,17 @@ tasks = {}
 
 # ====== FUNGSI UTAMA ======
 def setup_driver():
+    """Inisialisasi Chrome headless dengan chromedriver yang sudah terinstall di sistem."""
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")           # mode headless modern
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")  # hindari masalah shared memory di container
     chrome_options.add_argument("--disable-gpu")
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=chrome_options
-    )
+
+    # chromedriver sudah ada di /usr/bin/chromedriver (sesuai Dockerfile)
+    service = Service('/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def get_session_from_selenium():
@@ -131,13 +132,13 @@ def ekstrak_info(file_stream, opd_id):
         for sheet_name in sheets:
             ws = wb[sheet_name]
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row, values_only=True):
-                # Cek kolom B (1)
+                # Cek kolom B (index 1)
                 col_b = row[1] if len(row) > 1 else None
                 is_total = False
                 if col_b and isinstance(col_b, str) and col_b.strip().upper() == "TOTAL":
                     is_total = True
                 else:
-                    # Cek kolom A (0)
+                    # Cek kolom A (index 0)
                     col_a = row[0] if len(row) > 0 else None
                     if col_a and isinstance(col_a, str) and col_a.strip().upper() == "TOTAL":
                         is_total = True
