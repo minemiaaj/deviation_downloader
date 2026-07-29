@@ -11,7 +11,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager   # <-- kembali digunakan
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 from openpyxl.utils import get_column_letter
@@ -33,19 +32,19 @@ tasks = {}
 
 # ====== FUNGSI UTAMA ======
 def setup_driver():
-    """Inisialisasi Chrome headless menggunakan webdriver-manager."""
+    """Inisialisasi Chrome headless dengan chromedriver yang sudah terinstall di /usr/local/bin/chromedriver."""
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--headless=new")        # headless modern
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    # Opsi tambahan untuk menghindari error di container
+    # Opsi tambahan agar stabil di container
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--remote-debugging-port=0")
 
-    # ChromeDriverManager otomatis mendownload versi yang cocok
-    service = Service(ChromeDriverManager().install())
+    # chromedriver sudah diinstall manual di path berikut (sesuai Dockerfile)
+    service = Service('/usr/local/bin/chromedriver')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
