@@ -1,4 +1,5 @@
 flask
 selenium
+webdriver-manager
 requests
 openpyxl
